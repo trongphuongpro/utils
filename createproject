@@ -1,0 +1,91 @@
+#! /usr/bin/python3
+
+import os
+import os.path
+import sys
+
+templatesPath = "/home/trongphuong/Work/utils/templates/"
+
+
+def deleteDir(dirPath):
+	opt = input("Folder \'{}\' already exists, overwrite it? [Y/N]".format(dirPath))
+
+	if opt == 'Y' or opt == 'y':
+
+		for (dir, subdirs, files) in os.walk(dirPath, topdown=False):
+			for f in files:
+				filePath = os.path.join(dir, f)
+				os.remove(filePath)
+
+				if DEBUG:
+					print("Removed file {}".format(p))
+
+			os.rmdir(dir)
+
+			if DEBUG:
+				print("Removed dir {}".format(dir))
+		
+	else:
+		print("Process cancelled.")
+		sys.exit(0)
+
+
+def createEntries(dirPath, category):
+	
+	os.mkdir(dirPath)
+	os.chdir(dirPath)
+
+	os.mkdir('bin')
+	os.mkdir('build')
+	os.mkdir('include')
+	os.mkdir('src')
+	os.mkdir('lib')
+	os.makedirs('test/bin')
+	os.makedirs('test/build')
+	
+	file = open('CMakeLists.txt', 'w')
+	file.close()
+
+	file = open('README.md', 'w')
+	file.close()
+
+	file = open('.gitignore', 'w')
+	file.write("build/\nbin/\n*sublime*\nsftp-config.json")
+	file.close()
+
+	file = open('test/CMakeLists.txt', 'w')
+	file.close()
+
+	templateFile = templatesPath + category + "-CMakeLists.txt"
+	os.system("cp {} {}".format(templateFile, 'CMakeLists.txt'))
+	os.system("cp {} {}".format(templateFile, 'test/CMakeLists.txt'))
+
+	print("Process finished successfully.")
+
+
+DEBUG = False
+	
+if __name__ == "__main__":
+	if len(sys.argv) == 1:
+		dirPath = input("[Directory] ")
+	else:
+		dirPath = sys.argv[1]
+
+	categories = [f.split('-')[0] for f in os.listdir(templatesPath)]
+
+	text = "[Category]"
+	for cat in categories:
+		text += " " + cat
+
+	category = input(text + ": ")
+	if category not in categories:
+		print("Category [{}] is not available".format(category))
+		sys.exit(0)
+
+	if os.path.exists(dirPath):
+		deleteDir(dirPath)
+
+	createEntries(dirPath, category)
+
+
+
