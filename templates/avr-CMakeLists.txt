@@ -1,38 +1,9 @@
-###############################################################################
-##                           START USER CONFIGURATION                        ##
-###############################################################################
+cmake_minimum_required(VERSION 3.0)
 
-cmake_minimum_required(VERSION 3.0)                                        
-                                            
+set(MCU **MCU name**)
+set(TARGET **target filename**)
+set(F_CPU **frequency**)
 
-# Target filename                                                         
-set(TARGET_FILE **name of hex file**)                                     
-
-# Path to libraries                                                                           
-set(INCLUDE_DIRS **directories to libraries**)
-                                                                     
-# Load required source files in libraries                                                                            
-set(SOURCES **paths to source files**) 
-
-# Set F_CPU, MCU name and UART Baudrate
-set(F_CPU **MCU frequence**)                                                        
-set(MCU **MCU name**)                                                         
-set(BAUDRATE **baudrate**)                                                          
-
-# The programmer to use, read avrdude manual for list                       
-#set(PROG_TYPE **programmer**)
-
-# Set fuse bits (if want to flash the MCU with AVRDUDE)
-#set(E_FUSE **e-fuse byte**)
-#set(H_FUSE **h-fuse byte**)
-#set(L_FUSE **l-fuse byte**)
-#set(LOCK_BIT **lock bits**)
-
-###############################################################################
-##                           END USER CONFIGURATION                          ##
-###############################################################################
-
-# Use AVR GCC toolchain
 set(CMAKE_SYSTEM_NAME Generic)
 set(CMAKE_CXX_COMPILER avr-g++)
 set(CMAKE_C_COMPILER avr-gcc)
@@ -40,49 +11,27 @@ set(CMAKE_C_COMPILER avr-gcc)
 set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
 set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "")
 
-# Pass defines to compiler
-add_compile_definitions(
-    F_CPU=${F_CPU}
-    BAUD=${BAUDRATE}
-)
-
-# mmcu MUST be passed to bot the compiler and linker, this handle the linker
 set(CMAKE_EXE_LINKER_FLAGS -mmcu=${MCU})
 
 add_compile_options(
-    -mmcu=${MCU} # MCU
-    -std=gnu99
+    -mmcu=${MCU}
+    -std=gnu11
     -O2
     -Wall
     -Werror
 )
 
-# Load header files from library                                            
-include_directories(${INCLUDE_DIRS}) 
+add_definitions(
+	-DF_CPU=${F_CPU}	
+)
 
-# Create one target
-add_executable(${TARGET_FILE} ${SOURCES})
-
-# Rename the output to .elf as we will create multiple files
-set_target_properties(${TARGET_FILE} PROPERTIES OUTPUT_NAME ${TARGET_FILE}.elf)
-
-# Strip binary for upload
-add_custom_target(strip ALL avr-strip ${TARGET_FILE}.elf DEPENDS ${TARGET_FILE})
-
-# Transform binary into hex file, we ignore the eeprom segments in the step
-add_custom_target(hex ALL avr-objcopy -R .eeprom -R .fuse -R .lock -R .signature -O ihex ${TARGET_FILE}.elf ${TARGET_FILE}.hex DEPENDS strip)
-
-# Transform binary into hex file, this is the eeprom part (empty if you don't use eeprom static variables)
-add_custom_target(eeprom avr-objcopy -j .eeprom  --set-section-flags=.eeprom="alloc,load"  --change-section-lma .eeprom=0  -O ihex ${TARGET_FILE}.elf ${TARGET_FILE}.eep DEPENDS strip)
-
-# Upload the firmware with avrdude
-#add_custom_target(upload avrdude  -c ${PROG_TYPE} -p ${MCU} -U flash:w:${TARGET_FILE}.hex DEPENDS hex)
-
-# Upload the eeprom with avrdude
-#add_custom_target(upload_eeprom avrdude -c ${PROG_TYPE} -p ${MCU}  -U eeprom:w:${TARGET_FILE}.eep DEPENDS eeprom)
-
-# Burn fuses
-#add_custom_target(fuses avrdude -c ${PROG_TYPE} -p ${MCU}  -U lfuse:w:${L_FUSE}:m -U hfuse:w:${H_FUSE}:m -U efuse:w:${E_FUSE}:m -U lock:w:${LOCK_BIT}:m )
+#add_executable(${TARGET})
+#set_target_properties(${TARGET} PROPERTIES OUTPUT_NAME ${TARGET}.elf)
+#add_custom_target(strip ALL avr-strip ${TARGET}.elf DEPENDS ${TARGET})
+#add_custom_target(hex ALL avr-objcopy -R .eeprom -R .fuse -R .lock -R .signature -O ihex ${TARGET}.elf ${TARGET}.hex DEPENDS strip)
+#add_custom_target(eeprom avr-objcopy -j .eeprom --set-section-flags=.eeprom="alloc,load" --change-section-lma .eeprom=0 -O ihex ${TARGET}.elf ${TARGET}.eep DEPENDS strip)
 
 # Clean extra files
-set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${TARGET_FILE}.hex;${TARGET_FILE}.eeprom;${TARGET_FILE}.lst")
+#set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${TARGET}.hex;${TARGET}.eeprom;${TARGET}.lst")
+
+#install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.hex DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/bin)
