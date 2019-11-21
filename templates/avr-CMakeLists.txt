@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.0)
 
-set(MCU **MCU name**)
 set(TARGET **target filename**)
+set(MCU **MCU name**)
 set(F_CPU **frequency**)
 
 #-----------------------------------------------------------------------------#
@@ -22,16 +22,14 @@ target_link_libraries()
 target_include_directories()
 
 #-----------------------------------------------------------------------------#
-target_compile_options(${TARGET} PUBLIC
-    -mmcu=${MCU}
-    -std=gnu11
-    -O2
-    -Wall
-    -Werror
+target_compile_options(${TARGET} PUBLIC -mmcu=${MCU}
+    									-std=gnu11
+    									-O2
+    									-Wall
+    									-Werror
 )
-target_compile_definitions(${TARGET} PUBLIC
-	F_CPU=${F_CPU}	
-)
+
+target_compile_definitions(${TARGET} PUBLIC F_CPU=${F_CPU})
 #-----------------------------------------------------------------------------#
 #set_target_properties(${TARGET} PROPERTIES OUTPUT_NAME ${TARGET}.elf)
 #add_custom_target(strip ALL avr-strip ${TARGET}.elf DEPENDS ${TARGET})

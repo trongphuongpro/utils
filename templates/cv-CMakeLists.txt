@@ -1,10 +1,21 @@
 cmake_minimum_required(VERSION 3.0)
 
-find_package(OpenCV REQUIRED)
+set(TARGET **target filename**)
 
-add_compile_options(
-	-std=gnu++11
-	-Wall
-	-Werror
-	-O2
+#-----------------------------------------------------------------------------#
+find_package(OpenCV REQUIRED)
+#-----------------------------------------------------------------------------#
+
+add_subdirectory()
+add_executable()
+add_library()
+target_link_libraries()
+target_include_directories()
+
+#-----------------------------------------------------------------------------#
+target_compile_options(${TARGET} PUBLIC -std=gnu++11
+										-Wall
+										-Werror
+										-O2
 )
+#-----------------------------------------------------------------------------#
