@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 3.0)
 
-set(TARGET **target filename**)
-
 #-----------------------------------------------------------------------------#
 find_package(Threads REQUIRED)
 
@@ -11,6 +9,8 @@ set(CMAKE_C_COMPILER arm-gcc)
 #-----------------------------------------------------------------------------#
 
 add_subdirectory()
+
+set(TARGET **target filename**)
 add_executable()
 add_library()
 target_link_libraries()
