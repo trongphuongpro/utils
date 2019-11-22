@@ -11,10 +11,11 @@ set(CMAKE_C_COMPILER arm-gcc)
 add_subdirectory()
 
 set(TARGET **target filename**)
-add_executable()
-add_library()
-target_link_libraries()
-target_include_directories()
+
+add_executable(${TARGET} **source files**)
+add_library(${TARGET} STATIC **source files**)
+target_link_libraries(${TARGET} **lib**)
+target_include_directories(${TARGET} PUBLIC **dirs**)
 
 #-----------------------------------------------------------------------------#
 target_compile_options(${TARGET} PUBLIC -std=gnu++11
