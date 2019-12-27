@@ -4,11 +4,11 @@ import os
 import os.path
 import sys
 
-templatesPath = "/home/trongphuong/Work/utils/templates/"
+templatesPath = os.getenv("TEMPLATES_PATH")
 
 
 def deleteDir(dirPath):
-	opt = input("Folder \'{}\' already exists, overwrite it? [Y/N]".format(dirPath))
+	opt = input("Directory \'{}\' already exists, overwrite it? [Y/N]".format(dirPath))
 
 	if opt == 'Y' or opt == 'y':
 
@@ -52,7 +52,7 @@ def createEntries(dirPath, category):
 	file.write("build/\nbin/\n*sublime*\nsftp-config.json")
 	file.close()
 
-	templateFile = templatesPath + category + "-CMakeLists.txt"
+	templateFile = templatesPath + '/' + category + "-CMakeLists.txt"
 	os.system("cp {} {}".format(templateFile, 'CMakeLists.txt'))
 	os.system("cp {} {}".format(templateFile, 'test/CMakeLists.txt'))
 
@@ -67,6 +67,11 @@ if __name__ == "__main__":
 		dirPath = input("[Directory] ")
 	else:
 		dirPath = sys.argv[1]
+
+	if templatesPath is None:
+		print("Path to templates is not available.\n"
+			">> Please add environment variable TEMPLATES_PATH='path/to/your/templates'")
+		sys.exit(0)
 
 	categories = [f.split('-')[0] for f in os.listdir(templatesPath)]
 
