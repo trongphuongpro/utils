@@ -49,13 +49,18 @@ def createEntries(dirPath, category):
 	file.close()
 
 	file = open('.gitignore', 'w')
-	file.write("build/\nbin/\n*sublime*\nsftp-config.json")
+	file.write("build/\n"
+				"bin/\n"
+				"docs/\n"
+				"*sublime*\n"
+				"sftp-config.json\n")
 	file.close()
 
 	templateFile = templatesPath + '/' + category + "-CMakeLists.txt"
 	os.system("cp {} {}".format(templateFile, 'CMakeLists.txt'))
 	os.system("cp {} {}".format(templateFile, 'test/CMakeLists.txt'))
 
+	os.system("git init")
 	
 	print("Process finished successfully.")
 
