@@ -37,15 +37,14 @@ def createEntries(dirPath, category):
 
 	os.mkdir('bin')
 	os.mkdir('build')
+	os.mkdir('docs')
+	os.system("doxygen -g docs/doxygenconf > /dev/null")
 	os.mkdir('include')
 	os.mkdir('src')
 	os.mkdir('lib')
 	os.makedirs('test/bin')
 	os.makedirs('test/build')
 	
-	file = open('CMakeLists.txt', 'w')
-	file.close()
-
 	file = open('README.md', 'w')
 	file.close()
 
@@ -53,13 +52,11 @@ def createEntries(dirPath, category):
 	file.write("build/\nbin/\n*sublime*\nsftp-config.json")
 	file.close()
 
-	file = open('test/CMakeLists.txt', 'w')
-	file.close()
-
 	templateFile = templatesPath + category + "-CMakeLists.txt"
 	os.system("cp {} {}".format(templateFile, 'CMakeLists.txt'))
 	os.system("cp {} {}".format(templateFile, 'test/CMakeLists.txt'))
 
+	
 	print("Process finished successfully.")
 
 
