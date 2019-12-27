@@ -38,7 +38,7 @@ def createEntries(dirPath, category):
 	os.mkdir('bin')
 	os.mkdir('build')
 	os.mkdir('docs')
-	os.system("doxygen -g docs/doxygenconf > /dev/null")
+	os.system("doxygen -g docs/doxygen_config > /dev/null")
 	os.mkdir('include')
 	os.mkdir('src')
 	os.mkdir('lib')
