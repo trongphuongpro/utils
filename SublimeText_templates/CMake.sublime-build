@@ -1,0 +1,22 @@
+{
+    "selector": "source.c, source.c++",
+    "shell_cmd": "pwd",
+
+    "variants": [
+    	{
+    		"name": "Test",
+    		"working_dir": "${project_path}/test/build",
+    		"shell_cmd": "cmake .. && make && make install"
+    	},
+    	{
+    		"name": "Release",
+    		"working_dir": "${project_path}/build",
+    		"shell_cmd": "cmake -DCMAKE_BUILD_TYPE=Release .. && make && make install"
+    	},
+        {
+            "name": "Generate docs",
+            "working_dir": "${project_path}/docs",
+            "shell_cmd": "doxygen docs/config/Doxyfile"
+        },
+    ]
+}

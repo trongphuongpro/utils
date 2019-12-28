@@ -42,7 +42,7 @@ def createEntries(dirPath, category):
 	# create project structure
 	os.mkdir('bin')
 	os.mkdir('build')
-	os.mkdir('docs')
+	os.makedirs('docs/config')
 	os.mkdir('include')
 	os.mkdir('src')
 	os.mkdir('lib')
@@ -76,7 +76,7 @@ def createEntries(dirPath, category):
 
 	# copy Doxygen configuration file to project with default name "Doxyfile"
 	templateFile = templatesPath + doxygenTemplatesDir + "Doxyfile"
-	os.system("cp {} {}".format(templateFile, "docs"))
+	os.system("cp {} {}".format(templateFile, "docs/config"))
 
 	print("Process finished successfully.")
 
