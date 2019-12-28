@@ -16,7 +16,7 @@
         {
             "name": "Generate docs",
             "working_dir": "${project_path}/docs",
-            "shell_cmd": "doxygen docs/Doxyfile"
+            "shell_cmd": "doxygen docs/config/Doxyfile"
         },
     ]
 }
