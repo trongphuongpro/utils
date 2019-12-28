@@ -4,7 +4,10 @@ import os
 import os.path
 import sys
 
+
 templatesPath = os.getenv("TEMPLATES_PATH")
+cmakeTemplatesDir = '/CMake_templates/'
+doxygenTemplatesDir = '/Doxygen_templates/'
 
 
 def deleteDir(dirPath):
@@ -65,14 +68,15 @@ def createEntries(dirPath, category):
 	file.close()
 
 
-	# copy templates to project
-	templateFile = templatesPath + '/' + category + "-CMakeLists.txt"
+	# copy CMakeList.txt template to project
+	templateFile = templatesPath + cmakeTemplatesDir + category + "-CMakeLists.txt"
 	os.system("cp {} {}".format(templateFile, 'CMakeLists.txt'))
 	os.system("cp {} {}".format(templateFile, 'test/CMakeLists.txt'))
 
 
-	# create Doxygen configuration file with default name "Doxyfile"
-	os.system("cd docs && doxygen -g > /dev/null")
+	# copy Doxygen configuration file to project with default name "Doxyfile"
+	templateFile = templatesPath + doxygenTemplatesDir + "Doxyfile"
+	os.system("cp {} {}".format(templateFile, "docs"))
 
 	print("Process finished successfully.")
 
@@ -90,7 +94,7 @@ if __name__ == "__main__":
 			">> Please add environment variable TEMPLATES_PATH='path/to/your/templates'")
 		sys.exit(0)
 
-	categories = [f.split('-')[0] for f in os.listdir(templatesPath)]
+	categories = [f.split('-')[0] for f in os.listdir(templatesPath + cmakeTemplatesDir)]
 
 	text = "[Category]"
 	for cat in categories:
