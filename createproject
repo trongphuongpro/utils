@@ -35,33 +35,45 @@ def createEntries(dirPath, category):
 	os.mkdir(dirPath)
 	os.chdir(dirPath)
 
+
+	# create project structure
 	os.mkdir('bin')
 	os.mkdir('build')
 	os.mkdir('docs')
-	os.system("doxygen -g docs/doxygen_config > /dev/null")
 	os.mkdir('include')
 	os.mkdir('src')
 	os.mkdir('lib')
 	os.makedirs('test/bin')
 	os.makedirs('test/build')
 	
+
+	# create README.md
 	file = open('README.md', 'w')
 	file.close()
 
+
+	# initialize git repository for this project
+	os.system("git init")
+
+
+	# create .gitignore for git repository
 	file = open('.gitignore', 'w')
 	file.write("build/\n"
 				"bin/\n"
-				"docs/\n"
 				"*sublime*\n"
 				"sftp-config.json\n")
 	file.close()
 
+
+	# copy templates to project
 	templateFile = templatesPath + '/' + category + "-CMakeLists.txt"
 	os.system("cp {} {}".format(templateFile, 'CMakeLists.txt'))
 	os.system("cp {} {}".format(templateFile, 'test/CMakeLists.txt'))
 
-	os.system("git init")
-	
+
+	# create Doxygen configuration file with default name "Doxyfile"
+	os.system("cd docs && doxygen -g > /dev/null")
+
 	print("Process finished successfully.")
 
 
@@ -93,6 +105,3 @@ if __name__ == "__main__":
 		deleteDir(dirPath)
 
 	createEntries(dirPath, category)
-
-
-
