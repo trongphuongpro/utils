@@ -42,3 +42,4 @@ target_compile_definitions(${TARGET} PUBLIC F_CPU=${F_CPU})
 #set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${TARGET}.hex;${TARGET}.eeprom;${TARGET}.lst")
 #-----------------------------------------------------------------------------#
 #install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.hex DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/bin)
+#install(TARGETS ${TARGET} DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/bin)

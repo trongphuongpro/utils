@@ -8,14 +8,15 @@ import sys
 templatesPath = os.getenv("TEMPLATES_PATH")
 cmakeTemplatesDir = '/CMake_templates/'
 doxygenTemplatesDir = '/Doxygen_templates/'
+sublimeTemplatesDir = '/Sublime_templates/'
 
 
-def deleteDir(dirPath):
-	opt = input("Directory \'{}\' already exists, overwrite it? [Y/N]".format(dirPath))
+def deleteDir(directoryName):
+	opt = input("Directory \'{}\' already exists, overwrite it? [Y/N]".format(directoryName))
 
 	if opt == 'Y' or opt == 'y':
 
-		for (dir, subdirs, files) in os.walk(dirPath, topdown=False):
+		for (dir, subdirs, files) in os.walk(directoryName, topdown=False):
 			for f in files:
 				filePath = os.path.join(dir, f)
 				os.remove(filePath)
@@ -33,10 +34,10 @@ def deleteDir(dirPath):
 		sys.exit(0)
 
 
-def createEntries(dirPath, category):
+def createEntries(directoryName, category):
 	
-	os.mkdir(dirPath)
-	os.chdir(dirPath)
+	os.mkdir(directoryName)
+	os.chdir(directoryName)
 
 
 	# create project structure
@@ -78,6 +79,11 @@ def createEntries(dirPath, category):
 	templateFile = templatesPath + doxygenTemplatesDir + "Doxyfile"
 	os.system("cp {} {}".format(templateFile, "docs/config"))
 
+
+	# copy sublime-project file to project
+	templateFile = templatesPath + sublimeTemplatesDir + "x.sublime-project"
+	os.system("cp {} {}.{}".format(templateFile, directoryName, "sublime-project"))
+
 	print("Process finished successfully.")
 
 
@@ -85,9 +91,9 @@ DEBUG = False
 	
 if __name__ == "__main__":
 	if len(sys.argv) == 1:
-		dirPath = input("[Directory] ")
+		directoryName = input("[Directory] ")
 	else:
-		dirPath = sys.argv[1]
+		directoryName = sys.argv[1]
 
 	if templatesPath is None:
 		print("Path to templates is not available.\n"
@@ -105,7 +111,7 @@ if __name__ == "__main__":
 		print("Category [{}] is not available".format(category))
 		sys.exit(0)
 
-	if os.path.exists(dirPath):
-		deleteDir(dirPath)
+	if os.path.exists(directoryName):
+		deleteDir(directoryName)
 
-	createEntries(dirPath, category)
+	createEntries(directoryName, category)
