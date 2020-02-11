@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.0)
 
+set(TARGET **target filename**)
+
 #-----------------------------------------------------------------------------#
 
 find_package(OpenCV REQUIRED)
@@ -11,8 +13,6 @@ set(CMAKE_C_COMPILER gcc)
 #-----------------------------------------------------------------------------#
 
 add_subdirectory()
-
-set(TARGET **target filename**)
 
 add_executable(${TARGET} **source files**)
 

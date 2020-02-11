@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.0)
 
 set(MCU **MCU name**)
 set(F_CPU **frequency**)
+set(TARGET **target filename**)
 
 #-----------------------------------------------------------------------------#
 
@@ -17,36 +18,64 @@ set(CMAKE_EXE_LINKER_FLAGS -mmcu=${MCU})
 
 #-----------------------------------------------------------------------------#
 
-add_subdirectory()
-
-set(TARGET **target filename**)
-
-add_executable(${TARGET} **source files**)
-add_library(${TARGET} STATIC **source files**)
-
-target_link_libraries(${TARGET} **lib**)
-target_include_directories(${TARGET} PUBLIC **dirs**)
+option(FLASH "Flash the MCU" OFF)
 
 #-----------------------------------------------------------------------------#
 
-target_compile_options(${TARGET} PUBLIC -mmcu=${MCU}
-										-std=gnu11
-										-O2
-										-Wall
-										-Werror
-)
+if (FLASH)
+	message("[Flashing MCU]")
 
-target_compile_definitions(${TARGET} PUBLIC F_CPU=${F_CPU})
+	set(PORT **COM port**)
+	set(BAUDRATE **baudrate**)
+	set(PROGRAMMER avrisp)
+	set(LFUSE 0xE2)
+	set(HFUSE 0xD9)
+	set(EFUSE 0xFF)
 
-#-----------------------------------------------------------------------------#
+	add_custom_target(flash ALL avrdude -P ${PORT}
+										-b ${BAUDRATE}
+										-c ${PROGRAMMER} 
+										-p ${MCU} 
+										-U flash:w:${CMAKE_CURRENT_SOURCE_DIR}/bin/${TARGET}.hex
+										-U lfuse:w:${LFUSE}:m
+										-U hfuse:w:${HFUSE}:m
+										-U efuse:w:${EFUSE}:m
+	)
 
-#set_target_properties(${TARGET} PROPERTIES OUTPUT_NAME ${TARGET}.elf)
-#add_custom_target(strip ALL avr-strip ${TARGET}.elf DEPENDS ${TARGET})
-#add_custom_target(hex ALL avr-objcopy -R .eeprom -R .fuse -R .lock -R .signature -O ihex ${TARGET}.elf ${TARGET}.hex DEPENDS strip)
-#add_custom_target(eeprom avr-objcopy -j .eeprom --set-section-flags=.eeprom="alloc,load" --change-section-lma .eeprom=0 -O ihex ${TARGET}.elf ${TARGET}.eep DEPENDS strip)
-#add_custom_target(size ALL avr-size --format=avr --mcu=${MCU} ${TARGET}.elf DEPENDS strip)
+else ()
+	message("[Build]")
+	
+	add_subdirectory()
 
-#set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${TARGET}.hex;${TARGET}.eeprom;${TARGET}.lst")
+	add_executable(${TARGET} **source files**)
+	add_library(${TARGET} STATIC **source files**)
 
-#-----------------------------------------------------------------------------#
-#install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.hex DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/bin)
+	target_link_libraries(${TARGET} **lib**)
+	target_include_directories(${TARGET} PUBLIC **dirs**)
+
+	#-----------------------------------------------------------------------------#
+
+	target_compile_options(${TARGET} PUBLIC -mmcu=${MCU}
+											-std=gnu11
+											-O2
+											-Wall
+											-Werror
+	)
+
+	target_compile_definitions(${TARGET} PUBLIC F_CPU=${F_CPU})
+
+	#-----------------------------------------------------------------------------#
+
+	#set_target_properties(${TARGET} PROPERTIES OUTPUT_NAME ${TARGET}.elf)
+	#add_custom_target(strip ALL avr-strip ${TARGET}.elf DEPENDS ${TARGET})
+	#add_custom_target(hex ALL avr-objcopy -R .eeprom -R .fuse -R .lock -R .signature -O ihex ${TARGET}.elf ${TARGET}.hex DEPENDS strip)
+	#add_custom_target(eeprom avr-objcopy -j .eeprom --set-section-flags=.eeprom="alloc,load" --change-section-lma .eeprom=0 -O ihex ${TARGET}.elf ${TARGET}.eep DEPENDS strip)
+	#add_custom_target(size ALL avr-size --format=avr --mcu=${MCU} ${TARGET}.elf DEPENDS strip)
+
+	#set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${TARGET}.hex;${TARGET}.eeprom;${TARGET}.lst")
+
+	#-----------------------------------------------------------------------------#
+
+	#install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.hex DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/bin)
+
+endif()

@@ -1,32 +1,32 @@
 {
-	"selector": "source.c, source.c++",
-	"shell_cmd": "pwd",
+    "selector": "source.c, source.c++",
+    "shell_cmd": "pwd",
 
-	"variants": [
-		{
-			"name": "Build test",
-			"working_dir": "${project_path}/test/build",
-			"shell_cmd": "cmake -DFLASH=OFF .. && make && make install"
-		},
-		{
-			"name": "Flash test",
-			"working_dir": "${project_path}/test/build",
-			"shell_cmd": "cmake -DFLASH=ON .. && make"
-		},
-		{
-			"name": "Build release",
-			"working_dir": "${project_path}/build",
-			"shell_cmd": "cmake -DFLASH=OFF -DCMAKE_BUILD_TYPE=Release .. && make && make install"
-		},
-		{
-			"name": "Flash release",
-			"working_dir": "${project_path}/build",
-			"shell_cmd": "cmake -DFLASH=ON -DCMAKE_BUILD_TYPE=Release .. && make"
-		},
-		{
-			"name": "Generate docs",
-			"working_dir": "${project_path}/docs",
-			"shell_cmd": "doxygen config/Doxyfile"
-		},
-	]
+    "variants": [
+        {
+            "name": "BUILD test",
+            "working_dir": "${project_path}/test/build",
+            "shell_cmd": "cmake -DFLASH=OFF .. && make && make install"
+        },
+        {
+            "name": "BUILD release",
+            "working_dir": "${project_path}/build",
+            "shell_cmd": "cmake -DFLASH=OFF -DCMAKE_BUILD_TYPE=Release .. && make && make install"
+        },
+        {
+            "name": "FLASH test",
+            "working_dir": "${project_path}/test/build",
+            "shell_cmd": "cmake -DFLASH=ON .. && make"
+        },
+        {
+            "name": "FLASH release",
+            "working_dir": "${project_path}/build",
+            "shell_cmd": "cmake -DFLASH=ON -DCMAKE_BUILD_TYPE=Release .. && make"
+        },
+        {
+            "name": "GENERATE docs",
+            "working_dir": "${project_path}/docs",
+            "shell_cmd": "doxygen config/Doxyfile"
+        },
+    ]
 }
