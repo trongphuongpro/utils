@@ -9,6 +9,7 @@ templatesPath = os.getenv("TEMPLATES_PATH")
 cmakeTemplatesDir = '/CMake_templates/'
 doxygenTemplatesDir = '/Doxygen_templates/'
 sublimeTemplatesDir = '/Sublime_templates/'
+tivaTemplatesDir = '/TivaC_templates/'
 
 
 def deleteDir(directoryName):
@@ -83,6 +84,14 @@ def createEntries(directoryName, category):
 	# copy sublime-project file to project
 	templateFile = templatesPath + sublimeTemplatesDir + "x.sublime-project"
 	os.system("cp {} {}.{}".format(templateFile, directoryName, "sublime-project"))
+
+	# copy linker config file and startup file for TivaC project
+	if category == "tiva":
+		templateFile = templatesPath + tivaTemplatesDir + "linker_config.ld"
+		os.system("cp {} .".format(templateFile))
+
+		templateFile = templatesPath + tivaTemplatesDir + "startup_gcc.c"
+		os.system("cp {} {}".format(templateFile, 'src'))
 
 	print("Process finished successfully.")
 
