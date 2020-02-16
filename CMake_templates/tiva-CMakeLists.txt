@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.0)
 
 set(MCU TM4C123GH6PM)
+set(REV TM4C123_RA1)
 set(TARGET **target name**)
 set(TIVAWARE_PATH **/usr/local/TivaWare**)
 
@@ -16,12 +17,15 @@ set(CMAKE_ASM_COMPILER arm-none-eabi-as)
 set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
 set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "")
 
-set(CPU "-mcpu=cortex-m4")
-set(FPU "-mfpu=fpv4-sp-d16")
-set(FLOAT "-mfloat-abi=hard")
+set(CPU -mcpu=cortex-m4)
+set(FPU -mfpu=fpv4-sp-d16)
+set(FLOAT -mfloat-abi=hard)
 
-set(CMAKE_EXE_LINKER_FLAGS "${CPU} ${FPU} ${FLOAT} -T ${CMAKE_CURRENT_SOURCE_DIR}/linker_config.ld \
-							--entry ResetISR -Wl,--relax,--gc-sections")
+set(CMAKE_EXE_LINKER_FLAGS "${CPU} ${FPU} ${FLOAT} \
+							-T ${CMAKE_CURRENT_SOURCE_DIR}/linker_config.ld \
+							--entry ResetISR \
+							-Wl,--relax,--gc-sections \
+							-Wl,--no-check-sections")
 
 #-----------------------------------------------------------------------------#
 
@@ -52,7 +56,8 @@ else ()
 
 #-----------------------------------------------------------------------------#
 
-	target_compile_options(${TARGET} PUBLIC -mthumb
+	target_compile_options(${TARGET} PUBLIC -std=gnu11
+											-mthumb
 											${CPU}
 											${FPU}
 											${FLOAT}
@@ -60,13 +65,12 @@ else ()
 											-fdata-sections    
 											-MD                                         
 											-pedantic           
-											-std=gnu11
 											-O2
 											-Wall
 											-Werror
 	)
 
-	target_compile_definitions(${TARGET} PUBLIC TARGET_IS_TM4C123_RB1
+	target_compile_definitions(${TARGET} PUBLIC TARGET_IS_${REV}
 												PART_${MCU}
 	)
 
@@ -75,7 +79,7 @@ else ()
 	set_target_properties(${TARGET} PROPERTIES OUTPUT_NAME ${TARGET}.axf)
 	add_custom_target(strip ALL arm-none-eabi-strip ${TARGET}.axf DEPENDS ${TARGET})
 	add_custom_target(bin ALL arm-none-eabi-objcopy -O binary ${TARGET}.axf ${TARGET}.bin DEPENDS strip)
-	#add_custom_target(eeprom avr-objcopy -j .eeprom --set-section-flags=.eeprom="alloc,load" --change-section-lma .eeprom=0 -O ihex ${TARGET}.elf ${TARGET}.eep DEPENDS strip)
+	#add_custom_target(eeprom arm-objcopy -j .eeprom --set-section-flags=.eeprom="alloc,load" --change-section-lma .eeprom=0 -O binary ${TARGET}.axf ${TARGET}.eep DEPENDS strip)
 	add_custom_target(size ALL arm-none-eabi-size --format=gnu ${TARGET}.axf DEPENDS strip)
 
 	#set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${TARGET}.hex;${TARGET}.eeprom;${TARGET}.lst")
