@@ -6,10 +6,6 @@ set(TARGET **target filename**)
 
 find_package(OpenCV REQUIRED)
 
-set(CMAKE_SYSTEM_NAME Linux)
-set(CMAKE_CXX_COMPILER g++)
-set(CMAKE_C_COMPILER gcc)
-
 #-----------------------------------------------------------------------------#
 
 add_subdirectory()

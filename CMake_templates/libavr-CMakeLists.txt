@@ -4,18 +4,6 @@ set(TARGET **target name**)
 
 #-----------------------------------------------------------------------------#
 
-set(CMAKE_SYSTEM_NAME Generic)
-set(CMAKE_CXX_COMPILER avr-g++)
-set(CMAKE_C_COMPILER avr-gcc)
-set(CMAKE_ASM_COMPILER avr-as)
-
-set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
-set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "")
-
-set(CMAKE_EXE_LINKER_FLAGS -mmcu=${MCU})
-
-#-----------------------------------------------------------------------------#
-
 add_subdirectory()
 
 add_library(${TARGET} STATIC **source files**)

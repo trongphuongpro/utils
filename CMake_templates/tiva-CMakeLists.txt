@@ -3,9 +3,11 @@ cmake_minimum_required(VERSION 3.0)
 set(MCU TM4C123GH6PM)
 set(REV TM4C123_RA1)
 set(TARGET **target name**)
-set(TIVAWARE_PATH **/usr/local/TivaWare**)
+set(TIVAWARE_PATH **/path/to/TivaWare**)
 
 #-----------------------------------------------------------------------------#
+
+set(FAMILY TIVA)
 
 set(CMAKE_SYSTEM_NAME Generic)
 set(CMAKE_SYSTEM_PROCESSOR arm)
