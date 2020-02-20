@@ -46,7 +46,6 @@ else ()
 	add_executable(${TARGET} src/startup_gcc.c **source files**)
 
 	target_link_libraries(${TARGET} ${TIVAWARE_PATH}/driverlib/gcc/libdriver.a
-									${TIVAWARE_PATH}/usblib/gcc/libusb.a
 									**lib**
 	)
 

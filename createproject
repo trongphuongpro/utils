@@ -42,7 +42,10 @@ def createEntries(directoryName, category):
 
 
 	# create project structure
-	os.mkdir('bin')
+	# don't create dir bin for library project
+	if category[:3] != "lib":
+		os.mkdir('bin')
+
 	os.mkdir('build')
 	os.makedirs('docs/config')
 	os.mkdir('include')
@@ -73,6 +76,12 @@ def createEntries(directoryName, category):
 	# copy CMakeList.txt template to project
 	templateFile = templatesPath + cmakeTemplatesDir + category + "-CMakeLists.txt"
 	os.system("cp {} {}".format(templateFile, 'CMakeLists.txt'))
+
+	# copy CMakeList.txt template to project for testing
+	# ex. if category is libavr, then copy file avr-CMakeLists.txt for testing
+	if category[:3] == "lib":
+		templateFile = templatesPath + cmakeTemplatesDir + category[3:] + "-CMakeLists.txt"
+
 	os.system("cp {} {}".format(templateFile, 'test/CMakeLists.txt'))
 
 
@@ -112,7 +121,7 @@ if __name__ == "__main__":
 	categories = [f.split('-')[0] for f in os.listdir(templatesPath + cmakeTemplatesDir)]
 
 	text = "[Category]"
-	for cat in categories:
+	for cat in sorted(categories):
 		text += " " + cat
 
 	category = input(text + ": ")
