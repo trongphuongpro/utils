@@ -26,8 +26,7 @@ set(FLOAT -mfloat-abi=hard)
 set(CMAKE_EXE_LINKER_FLAGS "${CPU} ${FPU} ${FLOAT} \
 							-T ${CMAKE_CURRENT_SOURCE_DIR}/linker_config.ld \
 							--entry ResetISR \
-							-Wl,--relax,--gc-sections \
-							-Wl,--no-check-sections")
+							-Wl,--relax,--gc-sections")
 
 #-----------------------------------------------------------------------------#
 
