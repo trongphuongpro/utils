@@ -9,7 +9,7 @@ add_subdirectory()
 add_library(${TARGET} STATIC **source files**)
 
 target_link_libraries(${TARGET} **lib**)
-target_include_directories(${TARGET} PUBLIC **dirs**)
+target_include_directories(${TARGET} PRIVATE **dirs**)
 
 #-----------------------------------------------------------------------------#
 

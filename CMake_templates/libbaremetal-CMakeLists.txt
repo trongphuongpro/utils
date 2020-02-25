@@ -15,7 +15,7 @@ else()
 
 endif()
 
-target_include_directories(${TARGET} PUBLIC *dirs*)
+target_include_directories(${TARGET} PRIVATE *dirs*)
 
 #-----------------------------------------------------------------------------#
 
@@ -33,7 +33,7 @@ if (FAMILY STREQUAL AVR)
 
 elseif (FAMILY STREQUAL TIVA)
 	target_link_libraries(${TARGET} ${TIVAWARE_PATH}/driverlib/gcc/libdriver.a)
-	target_include_directories(${TARGET} PUBLIC ${TIVAWARE_PATH})
+	target_include_directories(${TARGET} PRIVATE ${TIVAWARE_PATH})
 
 	target_compile_options(${TARGET} PUBLIC -mthumb
 											${CPU}

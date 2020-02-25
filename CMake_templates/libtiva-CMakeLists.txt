@@ -12,7 +12,7 @@ target_link_libraries(${TARGET} ${TIVAWARE_PATH}/driverlib/gcc/libdriver.a
 								**lib**
 )
 
-target_include_directories(${TARGET} PUBLIC ${TIVAWARE_PATH} 
+target_include_directories(${TARGET} PRIVATE ${TIVAWARE_PATH} 
 											**dirs**
 )
 
