@@ -5,9 +5,11 @@ set(TARGET *target name*)
 #-----------------------------------------------------------------------------#
 
 if (SERIES STREQUAL ATMEGA)
+	add_subdirectory(*path A* *path B*)
 	add_library(${TARGET} STATIC *files*)
 
 elseif (SERIES STREQUAL TIVA)
+	add_subdirectory(*path A* *path B*)
 	add_library(${TARGET} STATIC *files*)
 
 else()
