@@ -1,7 +1,7 @@
 #! /home/trongphuong/Work/Flask/bin/python3
 
 import os
-import os.path
+import os.path as path
 import sys
 import json
 
@@ -18,7 +18,7 @@ class ErrorDialog(QDialog):
 
         label = QLabel(text)
         font = label.font()
-        font.setPointSize(15)
+        font.setPointSize(12)
         label.setFont(font)
 
         buttons = QDialogButtonBox.Ok
@@ -33,10 +33,52 @@ class ErrorDialog(QDialog):
         self.setLayout(layout)
 
 
+class OverridePrompt(QDialog):
+    def __init__(self, path, *arg, **kwarg):
+        super().__init__(*arg, **kwarg)
+
+        self.path = path
+
+        self.setWindowTitle("Override existing directory")
+
+        label = QLabel()
+        font = label.font()
+        font.setPointSize(10)
+        label.setFont(font)
+        label.setText(f"Directory {path} already exists.\nDo you want to override it?")
+
+        buttons = QDialogButtonBox.Yes | QDialogButtonBox.No
+        buttonBox = QDialogButtonBox(buttons)
+        buttonBox.accepted.connect(self.yes_callback)
+        buttonBox.rejected.connect(self.reject)
+
+
+        layout = QVBoxLayout()
+        layout.addWidget(label)
+        layout.addSpacing(10)
+        layout.addWidget(buttonBox)
+
+        self.setLayout(layout)
+
+
+    def yes_callback(self):
+        # remove existing directory
+        for (dir, subdirs, files) in os.walk(self.path, topdown=False):
+            for f in files:
+                filePath = os.path.join(dir, f)
+                os.remove(filePath)
+
+            os.rmdir(dir)
+        
+        self.accept()
+
+
 
 class PreferenceDialog(QDialog):
     def __init__(self, *arg, **kwarg):
         super().__init__(*arg, **kwarg)
+
+        self.template_directory = None
 
         self.setWindowTitle("Preferences")
 
@@ -70,6 +112,7 @@ class PreferenceDialog(QDialog):
 
 
     def cancel_callback(self):
+        self.template_directory = None
         self.reject()
 
 
@@ -78,11 +121,6 @@ class PreferenceDialog(QDialog):
                                                     "Open Directory",
                                                     "/home/trongphuong/Work")
 
-
-cmakeTemplatesDir = '/CMake_templates/'
-doxygenTemplatesDir = '/Doxygen_templates/'
-sublimeTemplatesDir = '/Sublime_templates/'
-tivaTemplatesDir = '/TivaC_templates/'
 
 
 class DataModel(QAbstractListModel):
@@ -157,11 +195,11 @@ class MainWindow(QMainWindow):
         self.line_name.setPlaceholderText("Type project name here")
 
         label_category = QLabel("Category:")
-        combo_category = QComboBox()
-        combo_category.currentTextChanged.connect(self.combo_category_callback)
-        categories = [f.split('-')[0] for f in os.listdir(self.template_directory + cmakeTemplatesDir)]
-        combo_category.addItem("")
-        combo_category.addItems(sorted(categories))
+        self.combo_category = QComboBox()
+        self.combo_category.currentTextChanged.connect(self.combo_category_callback)
+        categories = self.getCategories()
+        self.combo_category.addItem("")
+        self.combo_category.addItems(sorted(categories))
 
 
 
@@ -187,7 +225,7 @@ class MainWindow(QMainWindow):
         main_layout.addWidget(self.line_name, 1, 3, 1, 2)
 
         main_layout.addWidget(label_category, 2, 2, 1, 1)
-        main_layout.addWidget(combo_category, 2, 3, 1, 2)
+        main_layout.addWidget(self.combo_category, 2, 3, 1, 2)
 
         main_layout.addWidget(check_open, 3, 2, 1, 1)
         main_layout.addWidget(button_create, 3, 3, 1, 1)
@@ -201,6 +239,17 @@ class MainWindow(QMainWindow):
         self.setGeometry(400, 400, 500, 0)
 
 
+    def getCategories(self):
+        categories = []
+
+        for cat in os.listdir(self.template_directory):
+            if path.isdir(path.join(self.template_directory, cat)):
+                categories.append(cat)
+
+        return categories
+
+
+
     def button_directory_callback(self):
         self.directory = QFileDialog.getExistingDirectory(self, 
                                                     "Open Directory",
@@ -212,27 +261,13 @@ class MainWindow(QMainWindow):
         dialog = PreferenceDialog(self)
         dialog.exec()
 
-        self.template_directory = dialog.template_directory
+        self.template_directory = dialog.template_directory or self.template_directory
 
-
-    def button_create_callback(self):
-        if self.directory is None:
-            dialog = ErrorDialog("Missing directory")
-            dialog.exec()
-            return
-
-        if self.line_name.text() == "":
-            dialog = ErrorDialog("Missing project name")
-            dialog.exec()
-            return
-
-        if self.category == "":
-            dialog = ErrorDialog("Missing category")
-            dialog.exec()
-            return
-
-        full_path = os.path.join(self.directory, self.line_name.text())
-        print(full_path)
+        # update categories
+        categories = self.getCategories()
+        self.combo_category.clear()
+        self.combo_category.addItem("")
+        self.combo_category.addItems(sorted(categories))
 
 
     def check_open_callback(self, state):
@@ -257,8 +292,35 @@ class MainWindow(QMainWindow):
 
     def combo_category_callback(self, text):
         self.category = text
+        print(self.category)
 
+
+    def button_create_callback(self):
+        if self.directory is None:
+            dialog = ErrorDialog("Missing directory")
+            dialog.exec()
+            return
+
+        if self.line_name.text() == "":
+            dialog = ErrorDialog("Missing project name")
+            dialog.exec()
+            return
+
+        if self.category == "":
+            dialog = ErrorDialog("Missing category")
+            dialog.exec()
+            return
+
+        full_path = path.join(self.directory, self.line_name.text())
         
+        if path.exists(full_path):
+            prompt = OverridePrompt(full_path)
+            prompt.exec()
+
+
+
+    def createEntries(self):
+        pass
 
 
 app = QApplication(sys.argv)
