@@ -29,3 +29,5 @@ target_compile_options(${TARGET} PUBLIC -std=gnu++11
 )
 
 #-----------------------------------------------------------------------------#
+
+#install(TARGETS ${TARGET} DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/bin)

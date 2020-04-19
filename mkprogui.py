@@ -1,14 +1,16 @@
 #! /home/trongphuong/Work/Flask/bin/python3
 
 import os
-import os.path as path
+import shutil
 import sys
 import json
+from subprocess import run
 
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 
+config_file = "/home/trongphuong/Work/utils/mkcp_config.json"
 
 class ErrorDialog(QDialog):
     def __init__(self, text, *arg, **kwarg):
@@ -38,6 +40,7 @@ class OverridePrompt(QDialog):
         super().__init__(*arg, **kwarg)
 
         self.path = path
+        self.is_deleted = False
 
         self.setWindowTitle("Override existing directory")
 
@@ -63,15 +66,10 @@ class OverridePrompt(QDialog):
 
     def yes_callback(self):
         # remove existing directory
-        for (dir, subdirs, files) in os.walk(self.path, topdown=False):
-            for f in files:
-                filePath = os.path.join(dir, f)
-                os.remove(filePath)
-
-            os.rmdir(dir)
+        shutil.rmtree(self.path)
         
+        self.is_deleted = True
         self.accept()
-
 
 
 class PreferenceDialog(QDialog):
@@ -100,12 +98,14 @@ class PreferenceDialog(QDialog):
 
 
     def ok_callback(self):
-        with open("config.json", "r") as f:
-            config = json.load(f)
-            config["template_directory"] = self.template_directory
+        with open(config_file, "r") as f:
+            try:
+                config = json.load(f)
+                config["template_directory"] = self.template_directory
+            except:
+                config = {"template_directory": self.template_directory}
 
-
-        with open("config.json", "w") as f:
+        with open("mkcp_config.json", "w") as f:
             json.dump(config, f)
 
         self.accept()
@@ -122,25 +122,6 @@ class PreferenceDialog(QDialog):
                                                     "/home/trongphuong/Work")
 
 
-
-class DataModel(QAbstractListModel):
-    def __init__(self, *arg, **kwarg):
-        super().__init__(*arg, **kwarg)
-
-        #self.categories = 
-
-
-    def data(self, index, role):
-        if role == Qt.DisplayRole:
-            text = self.categories[index.row()]
-
-            return text
-
-
-    def rowCount(self, index):
-        return len(self.categories)
-
-
 class MainWindow(QMainWindow):
     def __init__(self, *arg, **kwarg):
         super().__init__(*arg, **kwarg)
@@ -151,11 +132,20 @@ class MainWindow(QMainWindow):
         self.add_examples = False
         self.is_open = False
 
-        self.directory = None
-        self.category = None
+        self.directory = ""
+        self.project_name = ""
+        self.category = ""
 
-        with open("config.json", "r") as f:
-            self.template_directory = json.load(f)["template_directory"]
+        # create mkcp_config.json if not exists
+        if not os.path.exists(config_file):
+            f = open(config_file, "w")
+            f.close()
+
+        with open(config_file, "r") as f:
+            try:
+                self.template_directory = json.load(f)["template_directory"]
+            except:
+                self.template_directory = None
 
         # Create options group box
         group_options = QGroupBox("Options")
@@ -242,9 +232,10 @@ class MainWindow(QMainWindow):
     def getCategories(self):
         categories = []
 
-        for cat in os.listdir(self.template_directory):
-            if path.isdir(path.join(self.template_directory, cat)):
-                categories.append(cat)
+        if self.template_directory:
+            for cat in os.listdir(self.template_directory):
+                if os.path.isdir(os.path.join(self.template_directory, cat)):
+                    categories.append(cat)
 
         return categories
 
@@ -292,16 +283,17 @@ class MainWindow(QMainWindow):
 
     def combo_category_callback(self, text):
         self.category = text
-        print(self.category)
 
 
     def button_create_callback(self):
-        if self.directory is None:
+        self.project_name = self.line_name.text()
+
+        if self.directory == "":
             dialog = ErrorDialog("Missing directory")
             dialog.exec()
             return
 
-        if self.line_name.text() == "":
+        if self.project_name == "":
             dialog = ErrorDialog("Missing project name")
             dialog.exec()
             return
@@ -311,16 +303,94 @@ class MainWindow(QMainWindow):
             dialog.exec()
             return
 
-        full_path = path.join(self.directory, self.line_name.text())
+        full_path = os.path.join(self.directory, self.line_name.text())
         
-        if path.exists(full_path):
+        # check if directory is existed or not
+        # delete it if user agrees
+        if os.path.exists(full_path):
             prompt = OverridePrompt(full_path)
             prompt.exec()
 
+            if prompt.is_deleted:
+                self.createEntries(full_path)
+
+        # create new directory after delete the old one
+        else:
+            self.createEntries(full_path)
 
 
-    def createEntries(self):
-        pass
+    def createEntries(self, path):
+        os.mkdir(path)
+        os.chdir(path)
+
+        os.mkdir('build')
+        os.mkdir('include')
+        os.mkdir('src')
+        os.mkdir('lib')
+
+        # add forder docs
+        if self.add_docs:
+            os.makedirs('docs/config')
+
+            src = os.path.join(self.template_directory, "Doxyfile")
+            shutil.copy2(src, "docs/config")
+
+        # add forder bin
+        if self.add_bin:
+            os.mkdir('bin')
+
+        # add forder exampless
+        if self.add_examples:
+            os.mkdir('examples')
+
+        # add forder test
+        if self.add_test:
+            os.makedirs('test/bin')
+            os.makedirs('test/build')
+
+
+        # create file README
+        file = open('README.md', 'w')
+        file.close()
+
+        # create git repo
+        os.system("git init")
+
+        # create .gitignore for git repository
+        file = open('.gitignore', 'w')
+        file.write("build/\n"
+                    "bin/\n"
+                    "*sublime*\n"
+                    "sftp-mkcp_config.json\n")
+        file.close()
+
+        # Copy file CMakeLists.txt into project
+        src = os.path.join(self.template_directory, self.category)
+        src = os.path.join(src, 'CMakeLists.txt')
+        shutil.copy2(src, '.')
+
+        # TODO: improve this HARDCODE implementation for Tiva C project
+        if self.category == 'tiva':
+            # copy file startup_gcc.c into folder src
+            src = os.path.join(self.template_directory, self.category)
+            src = os.path.join(src, 'startup_gcc.c')
+            shutil.copy2(src, 'src')
+
+            # copy linker config file
+            src = os.path.join(self.template_directory, self.category)
+            src = os.path.join(src, 'linker_config.ld')
+            shutil.copy2(src, '.')
+
+
+        # copy sublime-project file to project
+        src = os.path.join(self.template_directory, "x.sublime-project")
+        dst = f"{self.project_name}.sublime-project"
+        shutil.copy2(src, dst)
+
+        # open project in Sublime Text
+        if self.is_open:
+            run(["subl", dst])
+
 
 
 app = QApplication(sys.argv)

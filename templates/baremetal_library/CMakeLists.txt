@@ -61,3 +61,7 @@ else()
 	message(">> Failure due to missing SERIES.")
 
 endif()
+
+#-----------------------------------------------------------------------------#
+
+#install(TARGETS ${TARGET} DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/bin)

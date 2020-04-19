@@ -37,3 +37,5 @@ target_compile_definitions(${TARGET} PUBLIC TARGET_IS_${REV}
 )
 
 #-----------------------------------------------------------------------------#
+
+#install(TARGETS ${TARGET} DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/bin)

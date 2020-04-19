@@ -23,3 +23,5 @@ target_compile_options(${TARGET} PUBLIC -mmcu=${MCU}
 target_compile_definitions(${TARGET} PUBLIC F_CPU=${F_CPU})
 
 #-----------------------------------------------------------------------------#
+
+#install(TARGETS ${TARGET} DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/bin)
