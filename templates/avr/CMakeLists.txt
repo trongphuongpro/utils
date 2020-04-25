@@ -13,7 +13,7 @@ set(EFUSE 0xFF)
 
 #-----------------------------------------------------------------------------#
 
-set(SERIES ATMEGA)
+set(SERIES AVR)
 
 set(CMAKE_SYSTEM_NAME Generic)
 set(CMAKE_CXX_COMPILER avr-g++)

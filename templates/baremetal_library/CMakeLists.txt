@@ -4,7 +4,7 @@ set(TARGET *target name*)
 
 #-----------------------------------------------------------------------------#
 
-if (SERIES STREQUAL ATMEGA)
+if (SERIES STREQUAL AVR)
 	add_subdirectory(*path A* *path B*)
 	add_library(${TARGET} STATIC *files*)
 
@@ -21,7 +21,7 @@ target_include_directories(${TARGET} PRIVATE *dirs*)
 
 #-----------------------------------------------------------------------------#
 
-if (SERIES STREQUAL ATMEGA)
+if (SERIES STREQUAL AVR)
 	target_compile_options(${TARGET} PUBLIC -mmcu=${MCU}
 											-std=gnu11
 											-O2
