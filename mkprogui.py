@@ -105,7 +105,7 @@ class PreferenceDialog(QDialog):
             except:
                 config = {"template_directory": self.template_directory}
 
-        with open("mkcp_config.json", "w") as f:
+        with open(config_file, "w") as f:
             json.dump(config, f)
 
         self.accept()
@@ -371,6 +371,23 @@ class MainWindow(QMainWindow):
 
         # TODO: improve this HARDCODE implementation for Tiva C project
         if self.category == 'tiva':
+            # copy file startup_gcc.c into folder src
+            src = os.path.join(self.template_directory, self.category)
+            src = os.path.join(src, 'startup_gcc.c')
+            shutil.copy2(src, 'src')
+
+            # copy linker config file
+            src = os.path.join(self.template_directory, self.category)
+            src = os.path.join(src, 'linker_config.ld')
+            shutil.copy2(src, '.')
+
+        # TODO: improve this HARDCODE implementation for Tiva C FreeRTOS project
+        if self.category == 'tiva_freertos':
+            # copy file FreeRTOSConfig.h into folder include
+            src = os.path.join(self.template_directory, self.category)
+            src = os.path.join(src, 'FreeRTOSConfig.h')
+            shutil.copy2(src, 'include')
+
             # copy file startup_gcc.c into folder src
             src = os.path.join(self.template_directory, self.category)
             src = os.path.join(src, 'startup_gcc.c')
